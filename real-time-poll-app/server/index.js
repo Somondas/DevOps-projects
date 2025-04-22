@@ -20,9 +20,35 @@ const votes = {
   No: 0,
   "I never worked with Web Sockets": 0,
 };
+const ios = {
+  Yes: 0,
+  No: 0,
+};
 
 io.on("connection", (socket) => {
-  log("A usre connected: ", socket.id);
+  log("A user connected: ", socket.id);
 
   socket.emit("currentVotes", votes);
+
+  socket.on("vote", (option) => {
+    if (votes.hasOwnProperty(option)) {
+      votes[option]++;
+      io.emit("currentVotes", votes);
+      log(votes);
+    }
+  });
+  socket.on("socketio", (option) => {
+    if (ios.hasOwnProperty(option)) {
+      ios[option]++;
+      io.emit("knowSocket", ios);
+      log(ios);
+    }
+  });
+  socket.on("disconnect", () => {
+    log("User disconnected: ", socket.id);
+  });
+});
+
+server.listen(3001, () => {
+  console.log("Server listening on http://localhost:3001");
 });
